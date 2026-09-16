@@ -12,10 +12,72 @@ featured: true
 order: 1
 ---
 
-## Motivation
+## The mechanism
 
-Latent world models accumulate error when rolled out step by step.
+Anchor is a self-supervised consistency objective for latent world models. A model
+can reach the same future latent state in two ways: by applying its one-step
+dynamics repeatedly, or by predicting directly at a chosen horizon. Anchor
+penalizes disagreement between those two paths, using a stop-gradient target so
+the predictions cannot simply collapse toward each other.
 
-## Approach
+It is designed as a component, not an architecture — something to add to an
+existing latent world model rather than a model to adopt wholesale.
 
-Anchor penalizes disagreement between two ways of reaching the same horizon.
+## Why it might help
+
+Latent world models are accurate over short horizons and degrade over long ones.
+A small error in one predicted state becomes the input to the next, so errors
+compound and the rollout drifts away from the trajectory the real environment
+would produce. Direct horizon-conditioned prediction does not compound in the same
+way, which makes it a candidate reference signal for the rollout.
+
+## What the first experiment showed
+
+It didn't work, and the reason turned out to be more interesting than the
+mechanism.
+
+The first environment, ToyStateWorld, was built on the Hénon map with the state
+fully observable — deliberately minimal, so the behaviour of the mechanism could
+be isolated. A direct comparison across horizons k = 1 to 25 showed direct
+prediction performing **worse** than autoregressive rollout at every horizon,
+with no crossover anywhere in the range.
+
+That is the opposite of what Anchor needs. If direct prediction is never the
+better of the two paths, there is nothing for the rollout to be anchored to.
+
+The explanation is structural rather than a matter of tuning. For a
+well-specified model class with full observability, autoregressive rollout is
+asymptotically the stronger estimator. Direct prediction wins only under Markov
+misspecification — partial observability, observation noise, or hidden state.
+ToyStateWorld was designed to eliminate exactly those conditions, so it also
+eliminated the conditions under which the mechanism could help.
+
+Two smaller findings came out of the same round. For the direct predictor,
+adding a second hidden layer resolved a capacity bottleneck that increasing width
+had not. And one-hot encoding of the horizon outperformed scalar normalization,
+which had been letting the horizon signal interfere with state-space capacity in
+the shared network.
+
+## Next
+
+The immediate step is to reintroduce the conditions the first environment removed:
+expose only one coordinate of the Hénon map, retrain both predictors, and check
+whether a crossover appears in the drift curves. Only if it does is there a reason
+to implement the consistency loss itself.
+
+Beyond that, the intended progression is toward Point Maze and Push-T, where
+latent consistency can be evaluated against planning performance rather than
+prediction error alone.
+
+## Related work
+
+[DPWM](https://arxiv.org/abs/2608.07420) arrives at the same theoretical
+conditions from a different direction, and confirms when direct prediction should
+be expected to outperform rollout. The open question Anchor is aimed at is
+narrower: whether consistency between the two paths can be used as a training
+signal, rather than choosing between them.
+
+## Implementation
+
+PyTorch, with a centralized configuration and fixed seeds for reproducible
+comparison. Code is linked above.

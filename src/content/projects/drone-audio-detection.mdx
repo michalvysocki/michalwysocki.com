@@ -1,7 +1,7 @@
 ---
 title: "Drone Audio Detection"
 subtitle: "acoustic early warning, and where it breaks"
-description: "A Random Forest classifier on MFCC features reaching strong held-out metrics that then failed on real recordings while misflagging ambient noise. The case study is built around that gap: real-world test sets at fixed distances, cross-drone generalization, and an explicit account of what the training data does not contain."
+description: "A Random Forest classifier on MFCC features with local inference, reaching strong held-out metrics that then failed on real recordings while misflagging ambient noise. The generalization gap, not the accuracy number, is the finding."
 year: 2026
 inProgress: false
 tags: ["audio ML", "sim-to-real", "embedded"]
@@ -12,4 +12,43 @@ featured: true
 order: 2
 ---
 
-Description.
+## The system
+
+An acoustic early-warning classifier for drones: a Random Forest over MFCC
+features, trained to separate drone audio from ambient sound, with local
+inference rather than a server round-trip. The intended deployment target was an
+ESP32-S3 running the model bare-metal via `emlearn`, as one sensing modality in a
+distributed detection network.
+
+## The result that matters
+
+On held-out data the model looked good — ROC-AUC around 0.92, PR-AUC around 0.84.
+On real recordings it fell apart: it missed a DJI Mini 3 in most conditions,
+missed most drone clips pulled from YouTube, and raised alarms on ambient noise
+that contained no drone at all.
+
+The gap between those two numbers is the finding, not the first one.
+
+## Why
+
+The training data did not contain the acoustic conditions the model would meet in
+deployment. Held-out performance measured how well the model separated the classes
+*within that dataset*, which is a different question from whether the classes are
+separable in the field. Distance attenuates and filters the rotor signature; wind,
+traffic, and machinery occupy overlapping frequency bands; different airframes
+sound different enough that generalizing across them is not implied by
+generalizing across samples of one.
+
+This is the ordinary shape of a sim-to-real gap, and the ordinary reason it goes
+unnoticed: nothing in the standard validation protocol asks the question.
+
+## Status
+
+Work is suspended. The project overlaps with my employer's domain, and a
+non-compete obligation makes continuing it outside that context inappropriate for
+now.
+
+What exists is a trained and evaluated model with working local inference, and a
+documented account of where it breaks. The measurements that would close the gap —
+recordings at fixed distances, a confusable-sound class, cross-airframe validation
+— were scoped but not run.

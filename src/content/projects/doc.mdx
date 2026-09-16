@@ -12,4 +12,40 @@ featured: false
 order: 3
 ---
 
-Description.
+## What it is
+
+A local document research tool: you load papers and course material into it, and
+query them in a chat interface backed by retrieval over your own documents rather
+than the model's memory. Built because studying under load means re-reading the
+same material repeatedly to find one paragraph.
+
+## What runs today
+
+Ingestion routes PDFs, Office files, and plain text through a single endpoint into
+a ChromaDB vector store, chunked at 512 tokens with 100-token overlap. Queries run
+with retrieval on or off; when on, the retrieved chunks are prepended to the
+message as a text block rather than injected as a system message, which keeps the
+model's instruction context and the document context separate.
+
+The stack is a FastAPI backend and a React frontend under Docker Compose, with
+embeddings served through OpenRouter. It runs locally on macOS under Colima.
+
+## Where it's going
+
+The intended direction is a study tool rather than a chat wrapper: material
+organized by course or topic, retrieval that knows which source a claim came from,
+and eventually generated questions and review material from documents already
+loaded. The longer-term version of this is an educational platform rather than a
+personal tool.
+
+None of that is built. What exists is the retrieval layer it would sit on.
+
+## Status
+
+Active but not prioritized. Anchor comes first; Doc gets attention when it stops
+being good enough for what I need from it.
+
+The open question I'd want to answer before building anything on top is whether
+retrieval quality is actually good enough — chunk size, overlap, and the
+retrieval threshold are currently reasonable defaults rather than measured
+choices, and I have no evaluation set to tell me otherwise.

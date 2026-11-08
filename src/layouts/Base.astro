@@ -10,7 +10,7 @@ interface Props {
 
 const {
   title = "Michał Wysocki",
-  description = "I build machine learning systems that model and predict the real world.",
+  description = "I build models that predict the physical world, and study where they stop being right.",
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site);
@@ -36,7 +36,7 @@ const ogImage = new URL("/og.png", Astro.site);
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="sitemap" href="/sitemap-index.xml" />
-        <script
+    <script
       is:inline
       type="application/ld+json"
       set:html={JSON.stringify({
@@ -59,28 +59,9 @@ const ogImage = new URL("/og.png", Astro.site);
   </head>
   <body>
     <Nav />
-    <slot />
+    <main>
+      <slot />
+    </main>
     <Contact />
-        <script>
-      const els = document.querySelectorAll(".reveal");
-
-      if (els.length && "IntersectionObserver" in window) {
-        const io = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((e) => {
-              if (e.isIntersecting) {
-                e.target.classList.add("is-visible");
-                io.unobserve(e.target);
-              }
-            });
-          },
-          { rootMargin: "0px 0px -10% 0px" },
-        );
-
-        els.forEach((el) => io.observe(el));
-      } else {
-        els.forEach((el) => el.classList.add("is-visible"));
-      }
-    </script>
   </body>
 </html>

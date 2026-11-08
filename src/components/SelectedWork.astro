@@ -1,27 +1,17 @@
 ---
 import { getCollection } from "astro:content";
 import ProjectCard from "./ProjectCard.astro";
+import Section from "./Section.astro";
 
 const featured = (await getCollection("projects"))
   .filter((p) => p.data.featured)
   .sort((a, b) => a.data.order - b.data.order);
 ---
 
-<section class="reveal mx-auto max-w-2xl px-6 py-16">
-  <h2 class="font-serif text-sm uppercase tracking-widest text-muted">
-    Selected Work
-  </h2>
+<Section title="Selected work">
+  {featured.map((p) => <ProjectCard project={p} />)}
 
-  <div class="mt-6 border-b border-line">
-    {featured.map((p) => <ProjectCard project={p} />)}
-  </div>
-
-    <p class="mt-6 text-sm">
-      <a
-        href="/projects"
-        class="border-b border-line pb-0.5 transition-colors hover:border-fg"
-      >
-        All projects
-      </a>
-    </p>
-</section>
+  <p class="mt-4">
+    <a href="/projects" class="button">All projects</a>
+  </p>
+</Section>

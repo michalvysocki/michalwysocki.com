@@ -1,28 +1,30 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
-@import "@fontsource-variable/newsreader";
-@import "@fontsource-variable/inter";
+@import "@fontsource-variable/schibsted-grotesk";
+@import "@fontsource-variable/source-serif-4/opsz.css";
+@import "@fontsource-variable/source-serif-4/opsz-italic.css";
 
 @theme {
-  --font-serif: "Newsreader Variable", Georgia, serif;
-  --font-sans: "Inter Variable", system-ui, sans-serif;
+  --font-sans: "Schibsted Grotesk Variable", system-ui, sans-serif;
+  --font-serif: "Source Serif 4 Variable", Georgia, serif;
 
-  --color-bg: #fbfbf9;
-  --color-fg: #16161a;
-  --color-muted: #5a5a62;
-  --color-accent: #16161a;
-  --color-line: #e4e4df;
+  /* neutral paper, graphite ink, one ochre accent for "the model" */
+  --color-bg: #efefed;
+  --color-fg: #1c1d20;
+  --color-muted: #5f6267;
+  --color-accent: #8f5d10;
+  --color-line: #d8d8d4;
 
-  --color-inverse-bg: #1c1c20;
-  --color-inverse-fg: #eeeeea;
-  --color-inverse-muted: #8a8a92;
-  --color-inverse-line: #35353c;
+  /* the graphite footer */
+  --color-inverse-muted: #9b9ea4;
+  --color-inverse-accent: #d9a050;
 }
 
 html {
   scroll-behavior: smooth;
-  background-color: var(--color-inverse-bg);
+  /* matches the footer, so overscrolling past the bottom stays graphite */
+  background-color: var(--color-fg);
 }
 
 body {
@@ -32,39 +34,138 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+::selection {
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+
 :focus-visible {
-  outline: 2px solid var(--color-fg);
+  outline: 2px solid var(--color-accent);
   outline-offset: 3px;
 }
 
 footer :focus-visible {
-  outline-color: var(--color-inverse-fg);
+  outline-color: var(--color-inverse-accent);
+}
+
+/* Components live in a layer so Tailwind utilities can still override them. */
+@layer components {
+  .link {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+    text-decoration-color: color-mix(in srgb, var(--color-accent) 35%, transparent);
+    transition: text-decoration-color 150ms;
+  }
+
+  .link:hover {
+    text-decoration-color: currentColor;
+  }
+
+  .button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.95rem;
+    border: 1px solid var(--color-fg);
+    border-radius: 3px;
+    font-size: 0.9375rem;
+    line-height: 1.25;
+    color: var(--color-fg);
+    transition:
+      background-color 150ms,
+      color 150ms;
+  }
+
+  .button:hover {
+    background-color: var(--color-fg);
+    color: var(--color-bg);
+  }
+
+  .button-small {
+    padding: 0.3rem 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  /* An entry is the main text with a column of facts beside it on wide screens. */
+  .entry {
+    display: grid;
+    gap: 1.25rem 5rem;
+  }
+
+  @media (min-width: 64rem) {
+    .entry {
+      grid-template-columns: minmax(0, 1fr) 13rem;
+    }
+  }
+
+  /* Two facts side by side on narrow screens, links on their own row; a column on wide ones. */
+  .meta {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    align-content: start;
+    gap: 1rem 2rem;
+    font-size: 0.875rem;
+  }
+
+  .meta > :has(> .button) {
+    grid-column: 1 / -1;
+  }
+
+  .meta dt {
+    color: var(--color-muted);
+  }
+
+  @media (min-width: 64rem) {
+    .meta {
+      display: flex;
+      flex-direction: column;
+      padding-top: 0.4rem;
+    }
+  }
 }
 
 .prose {
   --tw-prose-body: var(--color-fg);
   --tw-prose-headings: var(--color-fg);
+  --tw-prose-links: var(--color-accent);
+  --tw-prose-bold: var(--color-fg);
+  --tw-prose-quotes: var(--color-muted);
+  --tw-prose-hr: var(--color-line);
+  font-family: var(--font-serif);
+  font-size: 1.1875rem;
+  line-height: 1.7;
+  max-width: 66ch;
+}
+
+.prose h2,
+.prose h3 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .prose h2 {
-  font-family: var(--font-serif);
-  font-size: 1.5rem;
-  font-weight: 400;
-  margin-top: 2.5rem;
+  font-size: 1.375rem;
+  margin-top: 2.75rem;
   margin-bottom: 0.75rem;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .reveal {
-    opacity: 0;
-    transform: translateY(12px);
-    transition:
-      opacity 600ms ease-out,
-      transform 600ms ease-out;
-  }
+.prose code {
+  font-size: 0.875em;
+  font-weight: 500;
+  padding: 0.1em 0.3em;
+  border-radius: 3px;
+  background-color: var(--color-line);
+}
 
-  .reveal.is-visible {
-    opacity: 1;
-    transform: none;
-  }
+.prose code::before,
+.prose code::after {
+  content: none;
+}
+
+.prose a {
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
 }

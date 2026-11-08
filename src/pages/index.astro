@@ -2,11 +2,11 @@
 import Base from "../layouts/Base.astro";
 import Hero from "../components/Hero.astro";
 import SelectedWork from "../components/SelectedWork.astro";
-import CurrentWork from "../components/CurrentWork.astro";
+import Achievements from "../components/Achievements.astro";
 ---
 
 <Base>
   <Hero />
-  <CurrentWork />
   <SelectedWork />
+  <Achievements limit={2} />
 </Base>

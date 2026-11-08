@@ -1,0 +1,112 @@
+---
+import { simulate } from "../lib/rollout";
+
+interface Props {
+  steps: number;
+  class?: string;
+}
+
+const { steps, class: className } = Astro.props;
+
+const { observed, rollout, error, drift } = simulate(steps);
+const maxError = Math.max(...error);
+
+// Trajectory panel on top, prediction error panel below, sharing the x axis.
+const W = steps * 23; // fixed step width, so fewer steps give a taller chart
+const H = 200;
+const GAP = 28;
+const EH = 64;
+const EY = H + GAP + EH; // error panel baseline
+const px = (i: number) => (i / steps) * W;
+const py = (v: number) => H / 2 - (v / 1.4) * (H / 2 - 8);
+const ey = (e: number) => EY - (e / maxError) * EH;
+const line = (pts: [number, number][]) =>
+  pts.map(([x, y], i) => `${i ? "L" : "M"}${x.toFixed(1)},${y.toFixed(1)}`).join("");
+const path = (vs: number[]) => line(vs.map((v, i) => [px(i), py(v)]));
+const errorLine = line(error.map((e, i) => [px(i), ey(e)]));
+const errorArea = `${errorLine}L${W},${EY}L0,${EY}Z`;
+---
+
+<svg
+  viewBox={`0 0 ${W} ${EY}`}
+  class:list={["rollout h-auto w-full overflow-visible", className]}
+  role="img"
+  aria-label={`Two trajectories of the Hénon map. A model rollout starting one millionth away from the true state follows it for ${drift} steps, then drifts away. Below, the prediction error stays near zero until step ${drift}, then grows sharply.`}
+>
+  <line x1="0" x2={W} y1={EY} y2={EY} class="stroke-line" stroke-width="1" vector-effect="non-scaling-stroke" />
+  <line
+    x1={px(drift)}
+    x2={px(drift)}
+    y1="0"
+    y2={EY}
+    class="drift-mark stroke-muted"
+    stroke-width="1"
+    stroke-dasharray="3 4"
+    vector-effect="non-scaling-stroke"
+  />
+  <path d={errorArea} class="error-area fill-accent" fill-opacity="0.16" />
+  <path
+    d={errorLine}
+    pathLength="1"
+    class="trace error stroke-accent"
+    fill="none"
+    stroke-width="1.5"
+    stroke-linejoin="round"
+    vector-effect="non-scaling-stroke"
+  />
+  <path
+    d={path(rollout)}
+    pathLength="1"
+    class="trace model stroke-accent"
+    fill="none"
+    stroke-width="3"
+    stroke-linejoin="round"
+    vector-effect="non-scaling-stroke"
+  />
+  <path
+    d={path(observed)}
+    pathLength="1"
+    class="trace observed stroke-fg"
+    fill="none"
+    stroke-width="1.5"
+    stroke-linejoin="round"
+    vector-effect="non-scaling-stroke"
+  />
+</svg>
+
+<style>
+  @media (prefers-reduced-motion: no-preference) {
+    .rollout[data-animate] .trace {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+    }
+
+    .rollout[data-animate] :is(.error-area, .drift-mark) {
+      opacity: 0;
+    }
+
+    .rollout.is-drawing .trace {
+      animation: draw 2.4s cubic-bezier(0.45, 0, 0.25, 1) forwards;
+    }
+
+    .rollout.is-drawing :is(.model, .error) {
+      animation-delay: 0.4s;
+    }
+
+    .rollout.is-drawing :is(.error-area, .drift-mark) {
+      animation: appear 0.8s ease-out 2.4s forwards;
+    }
+  }
+
+  @keyframes draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes appear {
+    to {
+      opacity: 1;
+    }
+  }
+</style>

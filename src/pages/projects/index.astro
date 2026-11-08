@@ -2,16 +2,13 @@
 import { getCollection } from "astro:content";
 import Base from "../../layouts/Base.astro";
 import ProjectCard from "../../components/ProjectCard.astro";
+import Section from "../../components/Section.astro";
 
 const projects = (await getCollection("projects")).sort((a, b) => a.data.order - b.data.order);
 ---
 
 <Base title="Projects — Michał Wysocki" description="Machine learning projects by Michał Wysocki — world models, acoustic drone detection, and retrieval systems.">
-  <section class="mx-auto max-w-2xl px-6 py-16">
-    <h1 class="font-serif text-4xl">Projects</h1>
-
-    <div class="mt-10 border-b border-line">
-      {projects.map((p) => <ProjectCard project={p} />)}
-    </div>
-  </section>
+  <Section title="Projects" as="h1">
+    {projects.map((p) => <ProjectCard project={p} as="h2" />)}
+  </Section>
 </Base>

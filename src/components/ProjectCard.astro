@@ -3,39 +3,43 @@ import type { CollectionEntry } from "astro:content";
 
 interface Props {
   project: CollectionEntry<"projects">;
+  // h2 when the list sits directly under the page's h1
+  as?: "h2" | "h3";
 }
 
-const { project } = Astro.props;
+const { project, as: Heading = "h3" } = Astro.props;
 const { data } = project;
 ---
 
-<article class="border-t border-line py-10">
-  <div class="flex items-baseline justify-between gap-4">
-    <h3 class="font-serif text-2xl">
-      <a href={`/projects/${project.id}`} class="hover:text-muted transition-colors">
+<article class="entry py-10 first:pt-0">
+  <div class="group relative max-w-2xl">
+    <Heading class="text-2xl font-semibold tracking-[-0.015em]">
+      <a
+        href={`/projects/${project.id}`}
+        class="after:absolute after:inset-0 group-hover:text-accent transition-colors"
+      >
         {data.title}
       </a>
-    </h3>
-    <span class="shrink-0 text-sm text-muted">
-      {data.inProgress ? "In progress" : data.year}
-    </span>
+    </Heading>
+    <p class="mt-1 text-base text-muted">{data.subtitle}</p>
+    <p class="mt-4 font-serif text-lg leading-relaxed">{data.description}</p>
   </div>
 
-  <p class="mt-1 text-base text-muted">{data.subtitle}</p>
-
-  <p class="mt-4 text-base leading-relaxed">{data.description}</p>
-
-  <div class="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
+  <dl class="meta">
+    <div>
+      <dt>Status</dt>
+      <dd>{data.inProgress ? "In progress" : data.year}</dd>
+    </div>
+    <div>
+      <dt>Topics</dt>
+      <dd>{data.tags.join(", ")}</dd>
+    </div>
     {
       data.links.map((l) => (
-        <a
-          href={l.href}
-          class="border-b border-line pb-0.5 transition-colors hover:border-fg"
-        >
-          {l.label}
-        </a>
+        <div>
+          <a href={l.href} class="button button-small">{l.label}</a>
+        </div>
       ))
     }
-    <span class="text-muted">{data.tags.join(" · ")}</span>
-  </div>
+  </dl>
 </article>

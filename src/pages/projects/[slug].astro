@@ -16,32 +16,32 @@ const { data } = project;
 ---
 
 <Base title={`${data.title} — Michał Wysocki`} description={data.description}>
-  <article class="mx-auto max-w-2xl px-6 py-16">
-    <div class="flex items-baseline justify-between gap-4">
-      <h1 class="font-serif text-4xl">{data.title}</h1>
-      <span class="shrink-0 text-sm text-muted">
-        {data.inProgress ? "In progress" : data.year}
-      </span>
+  <article class="entry mx-auto max-w-5xl px-6 pt-12 pb-16">
+    <div class="min-w-0">
+      <h1 class="text-4xl font-semibold tracking-[-0.025em] sm:text-5xl">{data.title}</h1>
+      <p class="mt-3 font-serif text-xl text-muted">{data.subtitle}</p>
+
+      <div class="prose mt-10">
+        <Content />
+      </div>
     </div>
 
-    <p class="mt-2 text-lg text-muted">{data.subtitle}</p>
-
-    <div class="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
+    <dl class="meta order-first mt-2 lg:order-none lg:sticky lg:top-8 lg:self-start lg:pt-3">
+      <div>
+        <dt>Status</dt>
+        <dd>{data.inProgress ? "In progress" : data.year}</dd>
+      </div>
+      <div>
+        <dt>Topics</dt>
+        <dd>{data.tags.join(", ")}</dd>
+      </div>
       {
         data.links.map((l) => (
-          <a
-            href={l.href}
-            class="border-b border-line pb-0.5 transition-colors hover:border-fg"
-          >
-            {l.label}
-          </a>
+          <div>
+            <a href={l.href} class="button button-small">{l.label}</a>
+          </div>
         ))
       }
-      <span class="text-muted">{data.tags.join(" · ")}</span>
-    </div>
-
-    <div class="prose mt-12">
-      <Content />
-    </div>
+    </dl>
   </article>
 </Base>

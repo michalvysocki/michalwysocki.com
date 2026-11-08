@@ -8,19 +8,18 @@ const links = [
 const path = Astro.url.pathname;
 ---
 
-<nav class="mx-auto flex max-w-2xl items-baseline justify-between px-6 py-8">
-  <a href="/" class="font-serif text-lg">Michał Wysocki</a>
+<nav class="mx-auto flex max-w-5xl items-baseline justify-between px-6 py-7">
+  <a href="/" class="text-base font-semibold tracking-[-0.01em]">Michał Wysocki</a>
 
-  <div class="flex gap-6 text-sm">
+  <div class="flex gap-6 text-base">
     {
       links.map((l) => (
         <a
           href={l.href}
+          aria-current={path.startsWith(l.href) ? "page" : undefined}
           class:list={[
-            "border-b pb-0.5 transition-colors",
-            path.startsWith(l.href)
-              ? "border-fg"
-              : "border-transparent hover:border-line",
+            "transition-colors hover:text-accent",
+            path.startsWith(l.href) ? "text-accent" : "text-muted",
           ]}
         >
           {l.label}

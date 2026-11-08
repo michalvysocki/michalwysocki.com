@@ -1,35 +1,67 @@
 ---
-const links = [
-  { label: "GitHub", href: "https://github.com/michalvysocki" },
-  { label: "LinkedIn", href: "https://www.linkedin.com/in/michalvysocki/" },
-  { label: "Email", href: "mailto:michalwysocki.priv@proton.me" },
-];
+import { experience } from "../data/experience";
+import RolloutChart from "./RolloutChart.astro";
+import { simulate } from "../lib/rollout";
+
+const current = experience.find((r) => r.current);
+const { drift } = simulate(44);
 ---
 
-<header class="mx-auto max-w-2xl px-6 pt-32 pb-24">
-  <h1 class="font-serif text-5xl tracking-tight sm:text-6xl">
-    Michał Wysocki
+<header class="mx-auto max-w-5xl px-6 pt-20 pb-20 sm:pt-28">
+  <h1 class="max-w-[21ch] text-4xl leading-[1.08] font-semibold tracking-[-0.025em] text-balance sm:text-6xl">
+    I build models that predict the physical world, and study where they
+    stop being right.
   </h1>
 
-    <p class="text-balance mt-6 text-xl leading-snug">
-    I build machine learning systems that model and predict the real world.
-  </p>
-
-  <p class="mt-5 text-base leading-relaxed text-muted">
+  <p class="mt-8 max-w-xl font-serif text-xl leading-relaxed text-muted">
     Autonomous systems and multimodal detection in practice; world models and
     representation learning in research.
   </p>
 
-  <nav class="mt-10 flex gap-6 text-sm">
-    {
-      links.map((l) => (
-        <a
-          href={l.href}
-          class="border-b border-line pb-0.5 transition-colors hover:border-fg"
-        >
-          {l.label}
-        </a>
-      ))
-    }
-  </nav>
+  {current && <p class="mt-6 text-base">{current.title} at {current.org}.</p>}
+
+  <p class="mt-6">
+    <a href="/cv" class="button">Experience and education</a>
+  </p>
+
+  <figure class="mt-16 sm:mt-20">
+    <RolloutChart steps={36} class="sm:hidden" />
+    <RolloutChart steps={44} class="hidden sm:block" />
+
+    <figcaption class="mt-5 grid gap-3 text-sm text-muted sm:grid-cols-[auto_1fr] sm:gap-10">
+      <span class="flex flex-wrap gap-x-5 gap-y-2">
+        <span class="flex items-center gap-2 text-fg"><i class="inline-block h-0.5 w-5 bg-fg"></i>Observed</span>
+        <span class="flex items-center gap-2 text-accent"><i class="inline-block h-0.5 w-5 bg-accent"></i>Model rollout</span>
+        <span class="flex items-center gap-2 text-accent"><i class="inline-block h-2.5 w-5 border-t-[1.5px] border-accent bg-accent/15"></i>Prediction error</span>
+      </span>
+      <span class="max-w-xl">
+        Hénon map. The rollout starts 10<sup>−6</sup> away from
+        the true state. The error stays invisible for {drift} steps, then
+        compounds. <a href="/projects/anchor" class="link">Anchor</a> is my
+        attempt at closing that gap.
+      </span>
+    </figcaption>
+  </figure>
 </header>
+
+<script is:inline>
+  // Draw the chart when it scrolls into view, so it isn't over before anyone sees it.
+  (() => {
+    if (!("IntersectionObserver" in window)) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("is-drawing");
+            io.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.4 },
+    );
+    document.querySelectorAll(".rollout").forEach((svg) => {
+      svg.dataset.animate = "";
+      io.observe(svg);
+    });
+  })();
+</script>

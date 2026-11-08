@@ -1,25 +1,25 @@
 ---
 import { education } from "../data/education";
+import Section from "./Section.astro";
 ---
 
-<section class="reveal mx-auto max-w-2xl px-6 py-16">
-  <h2 class="font-serif text-sm uppercase tracking-widest text-muted">
-    Education
-  </h2>
-
-  <div class="mt-6 border-b border-line">
-    {
-      education.map((s) => (
-        <article class="border-t border-line py-6">
-          <div class="flex items-baseline justify-between gap-4">
-            <h3 class="text-base font-medium">{s.field}</h3>
-            <span class="shrink-0 text-sm text-muted">{s.period}</span>
-          </div>
-          <p class="mt-0.5 text-base text-muted">
-            {s.institution} · {s.degree}
+<Section title="Education">
+  {
+    education.map((s) => (
+      <article class="entry py-8 first:pt-0 last:pb-0">
+        <div class="max-w-2xl">
+          <h3 class="text-lg font-semibold tracking-[-0.01em]">{s.field}</h3>
+          <p class="text-base text-muted">
+            {s.degree}, {s.institution}
           </p>
-        </article>
-      ))
-    }
-  </div>
-</section>
+        </div>
+        <dl class="meta">
+          <div>
+            <dt>Period</dt>
+            <dd>{s.period}</dd>
+          </div>
+        </dl>
+      </article>
+    ))
+  }
+</Section>

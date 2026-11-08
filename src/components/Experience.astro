@@ -1,24 +1,33 @@
 ---
 import { experience } from "../data/experience";
+import Section from "./Section.astro";
 ---
 
-<section class="reveal mx-auto max-w-2xl px-6 py-16">
-  <h2 class="font-serif text-sm uppercase tracking-widest text-muted">
-    Experience
-  </h2>
-
-  <div class="mt-6 border-b border-line">
+<Section title="Experience" as="h1">
+  <ol class="relative border-l border-line">
     {
       experience.map((r) => (
-        <article class="border-t border-line py-6">
-          <div class="flex items-baseline justify-between gap-4">
-            <h3 class="text-base font-medium">{r.title}</h3>
-            <span class="shrink-0 text-sm text-muted">{r.period}</span>
+        <li class="entry relative gap-y-1 pb-10 pl-7 last:pb-0 lg:gap-y-5">
+          <span
+            class:list={[
+              "absolute top-2 -left-[5px] size-[9px] rounded-full border",
+              r.current ? "border-accent bg-accent" : "border-muted bg-bg",
+            ]}
+            aria-hidden="true"
+          />
+          <div class="max-w-2xl">
+            <h2 class="text-lg font-semibold tracking-[-0.01em]">{r.title}</h2>
+            <p class="text-base text-muted">{r.org}</p>
+            <p class="mt-2 font-serif text-lg leading-relaxed">{r.summary}</p>
           </div>
-          <p class="mt-0.5 text-base text-muted">{r.org}</p>
-          <p class="mt-2 text-base leading-relaxed">{r.summary}</p>
-        </article>
+          <dl class="meta order-first lg:order-none">
+            <div>
+              <dt class="sr-only">Period</dt>
+              <dd class="text-muted lg:text-fg">{r.period}</dd>
+            </div>
+          </dl>
+        </li>
       ))
     }
-  </div>
-</section>
+  </ol>
+</Section>

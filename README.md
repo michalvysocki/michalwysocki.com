@@ -10,6 +10,7 @@ npm install
 npm run dev      # http://localhost:4321
 npm run build    # output to ./dist
 npm run preview  # serve the production build locally
+npm run og       # regenerate the social preview image and favicons
 ```
 
 Requires Node 22 or newer.
@@ -23,9 +24,11 @@ src/
     projects/    one .mdx file per project — frontmatter + long-form write-up
   data/          structured data with no long-form content (experience, education)
   layouts/       Base.astro — head, metadata, nav, footer
+  lib/           rollout.ts — the Hénon simulation behind the homepage chart
   pages/         routes: /, /projects, /projects/[slug], /cv, /about, 404
   styles/        global.css — design tokens in @theme
 public/          static assets served as-is (favicons, og.png, CNAME, robots.txt)
+scripts/         build-og.mjs — generates og.png and the favicons
 ```
 
 ## Adding content
@@ -41,6 +44,11 @@ the homepage is the one with 'current: true' value.
 
 **Design tokens** — colors and fonts live in the `@theme` block in
 `src/styles/global.css`. Change them there, not in component classes.
+
+**Social preview and favicons** — `npm run og` writes `assets/og.svg`,
+`public/og.png` and the favicons. The headline is copied into
+`scripts/build-og.mjs` by hand, so rerun it after changing the one in
+`src/components/Hero.astro`.
 
 ## Deployment
 

@@ -1,0 +1,23 @@
+---
+interface Props {
+  title: string;
+  as?: "h1" | "h2";
+  id?: string;
+}
+
+const { title, as: Heading = "h2", id } = Astro.props;
+---
+
+<section id={id} class="mx-auto max-w-5xl scroll-mt-8 px-6 py-14">
+  <Heading
+    class:list={[
+      "font-semibold tracking-[-0.02em]",
+      Heading === "h1" ? "text-4xl sm:text-5xl" : "text-2xl sm:text-3xl",
+    ]}
+  >
+    {title}
+  </Heading>
+  <div class="mt-8">
+    <slot />
+  </div>
+</section>
